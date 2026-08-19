@@ -1,30 +1,53 @@
-/vendor/
-node_modules/
-npm-debug.log
-yarn-error.log
+# macOS
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
 
-# Laravel 4 specific
-bootstrap/compiled.php
-app/storage/
+# Windows
+Thumbs.db
+Thumbs.db:encryptable
+ehthumbs.db
+ehthumbs_vis.db
+desktop.ini
+$RECYCLE.BIN/
+*.cab
+*.msi
+*.msm
+*.msp
+*.lnk
 
-# Laravel 5 & Lumen specific
-public/storage
-public/hot
+### Visual Studio Code ###
+# Ignore the entire folder by default to avoid tracking personal state
+.vscode/*
 
-# Laravel 5 & Lumen specific with changed public path
-public_html/storage
-public_html/hot
+# EXCEPT for team-shared configuration files you WANT to track:
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+!.vscode/*.code-snippets
 
-storage/*.key
+# Ignore personal workspace workspaces and extension packages
+*.code-workspace
+*.vsix
+
+### Other Common Editors ###
+# JetBrains (IntelliJ, WebStorm, PyCharm, etc.)
+.idea/
+
+# Sublime Text
+*.sublime-project
+*.sublime-workspace
+
+# Vim
+.*.swp
+.*.swo
+.netrwhist
+
+#dev
 .env
-Homestead.yaml
-Homestead.json
-/.vagrant
-.phpunit.result.cache
-
-/public/build
-/storage/pail
-.env.backup
-.env.production
-.phpactor.json
-auth.json
+.env.*
