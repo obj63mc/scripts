@@ -7,6 +7,8 @@ A grab bag of shell scripts I use for local development on macOS.
 | Script | What it does | Docs |
 | ------ | ------------ | ---- |
 | `addvhost.sh` | Creates an Apache vhost (HTTP + HTTPS with `mkcert` certs) and a `.loc` hosts entry for Homebrew httpd. | [docs/addvhost.md](docs/addvhost.md) |
+| `heroku-maintenance.sh` | Turns maintenance mode on or off for every running PHP app on Heroku. | [docs/heroku-maintenance.md](docs/heroku-maintenance.md) |
+| `render-maintenance.sh` | Turns maintenance mode on or off for a fixed list of Render services. | [docs/render-maintenance.md](docs/render-maintenance.md) |
 | `webp.sh` | Recursively converts images to WebP and deletes the originals. | [docs/webp.md](docs/webp.md) |
 
 ## Requirements
