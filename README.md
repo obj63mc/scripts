@@ -9,6 +9,7 @@ A grab bag of shell scripts I use for local development on macOS.
 | `addvhost.sh` | Creates an Apache vhost (HTTP + HTTPS with `mkcert` certs) and a `.loc` hosts entry for Homebrew httpd. | [docs/addvhost.md](docs/addvhost.md) |
 | `composer-bulk-update/composer-bulk-update.sh` | Checkbox picker over subfolders that have a `composer.json`; runs `composer update` in each one you tick. | [docs/composer-bulk-update.md](docs/composer-bulk-update.md) |
 | `heroku-maintenance.sh` | Turns maintenance mode on or off for every running PHP app on Heroku. | [docs/heroku-maintenance.md](docs/heroku-maintenance.md) |
+| `render-bulk-deploy/render-bulk-deploy.sh` | Checkbox picker over Render services; redeploys each one you tick at its live commit with the build cache cleared. | [docs/render-bulk-deploy.md](docs/render-bulk-deploy.md) |
 | `render-maintenance.sh` | Turns maintenance mode on or off for a fixed list of Render services. | [docs/render-maintenance.md](docs/render-maintenance.md) |
 | `webp.sh` | Recursively converts images to WebP and deletes the originals. | [docs/webp.md](docs/webp.md) |
 
