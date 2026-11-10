@@ -4,6 +4,7 @@
 #
 #   composer-bulk-update          -> list ./*/ folders that have a composer.json, pick, update
 #   composer-bulk-update ~/Sites  -> same, for another directory
+#   composer-bulk-update --git    -> also git pull first, then commit the composer files and push
 #
 # Keys: up/down or j/k move, space toggles, a toggles all, enter runs, q quits.
 # Updates run one at a time with composer's output shown live. A failed update doesn't stop
@@ -11,11 +12,15 @@
 
 set -euo pipefail
 
+COMMIT_MESSAGE='updating composer deps'
+
 usage() {
     cat >&2 <<EOF
-usage: $(basename "$0") [dir]
+usage: $(basename "$0") [-g|--git] [dir]
 
-  dir  folder whose immediate subfolders are scanned for composer.json (default: current dir)
+  -g, --git  in each project: git pull, composer update, commit composer.json/.lock with
+             "$COMMIT_MESSAGE", then push the current branch to origin
+  dir        folder whose immediate subfolders are scanned for composer.json (default: current dir)
 EOF
     exit 1
 }
@@ -101,12 +106,57 @@ pick() {
     done
 }
 
-main() {
-    case "${1:-}" in -h | --help) usage ;; esac
-    [ $# -le 1 ] || usage
+# Update one project. Runs in a subshell so the cd doesn't leak. With GIT=1 it pulls first,
+# then commits composer.json and composer.lock and pushes the current branch to origin.
+update_project() (
+    local branch file files=()
+    cd "$1" || return 1
 
-    ROOT=$(cd "${1:-.}" && pwd) || die "no such directory: $1"
+    if [ "$GIT" = 1 ]; then
+        # Fails on a detached HEAD, where there's no branch to push.
+        branch=$(git symbolic-ref --short HEAD) || return 1
+        git pull || return 1
+    fi
+
+    composer update || return 1
+    [ "$GIT" = 1 ] || return 0
+
+    # Libraries often gitignore composer.lock, and `git add` errors on ignored paths.
+    for file in composer.json composer.lock; do
+        if [ -f "$file" ] && ! git check-ignore -q "$file"; then files+=("$file"); fi
+    done
+
+    git add -- "${files[@]}" || return 1
+    if git diff --cached --quiet -- "${files[@]}"; then
+        echo "nothing to commit"
+        return 0
+    fi
+    # The pathspec keeps anything else that's staged out of this commit.
+    git commit -m "$COMMIT_MESSAGE" -- "${files[@]}" && git push origin "$branch"
+)
+
+main() {
+    GIT=0
+    local target=. positional=0
+    while [ $# -gt 0 ]; do
+        case $1 in
+            -h | --help) usage ;;
+            -g | --git) GIT=1 ;;
+            -*) usage ;;
+            *)
+                target=$1
+                positional=$((positional + 1))
+                ;;
+        esac
+        shift
+    done
+    [ "$positional" -le 1 ] || usage
+
+    ROOT=$(cd "$target" && pwd) || die "no such directory: $target"
     command -v composer > /dev/null || die "composer not found on PATH"
+    if [ "$GIT" = 1 ]; then
+        command -v git > /dev/null || die "git not found on PATH"
+    fi
 
     PROJECTS=()
     local dir
@@ -119,7 +169,7 @@ main() {
     for dir in "${SELECTED[@]}"; do
         name=${dir##*/}
         printf '\n\033[1m==> %s\033[0m\n' "$name"
-        if (cd "$dir" && composer update); then
+        if update_project "$dir"; then
             summary+=$'\033[32m✓\033[0m '"$name"$'\n'
         else
             summary+=$'\033[31m✗\033[0m '"$name"$'\n'
