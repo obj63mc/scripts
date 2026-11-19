@@ -8,6 +8,8 @@ A grab bag of shell scripts I use for local development on macOS.
 | ------ | ------------ | ---- |
 | `addvhost.sh` | Creates an Apache vhost (HTTP + HTTPS with `mkcert` certs) and a `.loc` hosts entry for Homebrew httpd. | [docs/addvhost.md](docs/addvhost.md) |
 | `composer-bulk-update/composer-bulk-update.sh` | Checkbox picker over subfolders that have a `composer.json`; runs `composer update` in each one you tick. | [docs/composer-bulk-update.md](docs/composer-bulk-update.md) |
+| `heroku-bulk-deploy/heroku-bulk-deploy.sh` | Checkbox picker over Heroku apps; rebuilds each one you tick at its live commit with the build cache purged. | [docs/heroku-bulk-deploy.md](docs/heroku-bulk-deploy.md) |
+| `heroku-bulk-push/heroku-bulk-push.sh` | Checkbox picker over subfolders with a `heroku` remote; pushes each one's current branch to the branch Heroku deploys from. | [docs/heroku-bulk-push.md](docs/heroku-bulk-push.md) |
 | `heroku-maintenance.sh` | Turns maintenance mode on or off for every running PHP app on Heroku. | [docs/heroku-maintenance.md](docs/heroku-maintenance.md) |
 | `rds-ip.sh` | Lists, adds or removes MySQL (3306) inbound rules on the gccdb RDS security group. | [docs/rds-ip.md](docs/rds-ip.md) |
 | `render-bulk-deploy/render-bulk-deploy.sh` | Checkbox picker over Render services; redeploys each one you tick at its live commit with the build cache cleared. | [docs/render-bulk-deploy.md](docs/render-bulk-deploy.md) |
