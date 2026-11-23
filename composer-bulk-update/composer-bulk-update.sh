@@ -2,9 +2,9 @@
 #
 # composer-bulk-update — tick the subfolders you want, then run `composer update` in each.
 #
-#   composer-bulk-update          -> list ./*/ folders that have a composer.json, pick, update
+#   composer-bulk-update          -> list ./*/ folders that have a composer.json, pick, pull, update
 #   composer-bulk-update ~/Sites  -> same, for another directory
-#   composer-bulk-update --git    -> also git pull first, then commit the composer files and push
+#   composer-bulk-update --git    -> also commit the composer files and push after updating
 #
 # Keys: up/down or j/k move, space toggles, a toggles all, enter runs, q quits.
 # Updates run one at a time with composer's output shown live. A failed update doesn't stop
@@ -18,8 +18,8 @@ usage() {
     cat >&2 <<EOF
 usage: $(basename "$0") [-g|--git] [dir]
 
-  -g, --git  in each project: git pull, composer update, commit composer.json/.lock with
-             "$COMMIT_MESSAGE", then push the current branch to origin
+  -g, --git  after composer update, commit composer.json/.lock with "$COMMIT_MESSAGE",
+             then push the current branch to origin (git pull always runs first either way)
   dir        folder whose immediate subfolders are scanned for composer.json (default: current dir)
 EOF
     exit 1
@@ -106,16 +106,22 @@ pick() {
     done
 }
 
-# Update one project. Runs in a subshell so the cd doesn't leak. With GIT=1 it pulls first,
-# then commits composer.json and composer.lock and pushes the current branch to origin.
+# Update one project. Runs in a subshell so the cd doesn't leak. Git repos are always pulled
+# first; with GIT=1 it then commits composer.json and composer.lock and pushes the current
+# branch to origin.
 update_project() (
     local branch file files=()
     cd "$1" || return 1
 
-    if [ "$GIT" = 1 ]; then
-        # Fails on a detached HEAD, where there's no branch to push.
+    if git rev-parse --is-inside-work-tree > /dev/null 2>&1; then
+        # Fails on a detached HEAD, where there's no branch to pull or push.
         branch=$(git symbolic-ref --short HEAD) || return 1
         git pull || return 1
+    elif [ "$GIT" = 1 ]; then
+        echo "not a git repository" >&2
+        return 1
+    else
+        echo "not a git repository, skipping git pull"
     fi
 
     composer update || return 1
@@ -154,9 +160,7 @@ main() {
 
     ROOT=$(cd "$target" && pwd) || die "no such directory: $target"
     command -v composer > /dev/null || die "composer not found on PATH"
-    if [ "$GIT" = 1 ]; then
-        command -v git > /dev/null || die "git not found on PATH"
-    fi
+    command -v git > /dev/null || die "git not found on PATH"
 
     PROJECTS=()
     local dir
